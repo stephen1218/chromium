@@ -1,0 +1,29 @@
+description = "为主干的差异生成浏览器测试"
+prompt = """
+请生成涵盖此差异添加的所有新C++代码路径的浏览器测试：
+
+```diff
+!{git diff --cached origin/main '*.h' '*.cc' ':!*test.cc'}
+```
+
+步骤：
+1. 在每个相关目录中查找以`_browsertest.cc`结尾的文件来存放新测试。
+2. 阅读每个测试文件以了解现有测试用例、测试夹具、辅助方法和模拟对象。为了熟悉浏览器测试API，
+   您还应该阅读：
+    * `//content/public/test/browser_test_base.h`
+    * `//content/public/test/browser_test_utils.h`
+    * `//content/public/test/content_browser_test.h`
+3. 决定测试覆盖范围应该放在哪里：
+    * 外观更改或内部重构不需要测试更改。
+    * 有时，向现有测试用例添加断言比设计新测试用例更容易（例如，检查类上的新成员）。
+    * 更新现有测试可能也是必要的，以捕获对生产逻辑的更改。
+4. 在每个测试文件中添加或更新测试用例：
+    * 任何新的测试用例都应该类似于现有用例。
+    * 不要修改生产代码。
+    * 要测试布尔表达式，始终使用`ASSERT_TRUE(...)`而不是
+      `ASSERT_EQ(true, ...)`（同样优先使用`ASSERT_FALSE(...)`、
+      `EXPECT_TRUE(...)`和`EXPECT_FALSE(...)`）。
+    * 有关断言的详细信息，请参阅`//third_party/googletest/src/docs/reference/assertions.md`。
+5. 运行`git cl format`。
+6. 使用`//tools/autotest.py`验证新更改。
+"""
